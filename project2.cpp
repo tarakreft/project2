@@ -21,6 +21,10 @@ struct song {
     char   albumTitle[maxChar];
     int    index;
 };
+void addSong(song& addedSong, song songList[], int& songListSize);
+void readLibrary(char fileName[], song songList[], int& songListSize);
+void displaySongs(song songList[], int& songListSize);
+void addNewSong(song songList[], int& songListSize);
 
 //add a song to the library
 void addSong(song& addedSong, song songList[], int& songListSize){
@@ -90,10 +94,106 @@ void displaySongs(song songList[], int& songListSize){
 
 
 // add songs
+void addNewSong(char fileName[], song songList[], int& songListSize){
+    song addedSong;
+
+    char     tempSongTitle[maxChar];
+    char     tempArtistName[maxChar];
+    char     tempSongMins[4];
+    char     tempSongSecs[4];
+    char     tempAlbumTitle[maxChar];
+    ifstream infile;
+    
+    cout << "Please enter the title of the song you are add to the library:";
+    cin.getline(tempSongTitle, maxChar, '\n');
+    while(!cin){
+        cin.clear();
+        cin.ignore(maxChar, '\n');
+        cout << "Too Long. Please re-enter the title:" << endl;
+        cin.getline(tempSongTitle, maxChar, '\n');
+    }
+    
+    cout << "Please enter the artist's name of the song you are adding to the library:";
+    cin.getline(tempArtistName, maxChar, '\n');
+    while(!cin){
+        cin.clear();
+        cin.ignore(maxChar, '\n');
+        cout << "Too Long. Please re-enter the artist's name:" << endl;
+        cin.getline(tempArtistName, maxChar, '\n');
+    }
+    
+    cout << "Please enter the minutes of the song you are adding to the library:";
+    cin.getline(tempSongMins, 4, '\n');
+    while(!cin){
+        cin.clear();
+        cin.ignore(maxChar, '\n');
+        cout << "Too Long. Please re-enter the minutes:" << endl;
+        cin.getline(tempSongMins, 4, '\n');
+    }
+
+    cout << "Please enter the seconds of the song you are adding to the library:";
+    cin.getline(tempSongSecs, 4, '\n');
+    while(!cin){
+        cin.clear();
+        cin.ignore(maxChar, '\n');
+        cout << "Too Long. Please re-enter the seconds:" << endl;
+        cin.getline(tempSongMins, 4, '\n');
+    }
+    
+    cout << "Please enter the album title of the song you are adding to the library:";
+    cin.getline(tempAlbumTitle, maxChar, '\n');
+    while(!cin){
+        cin.clear();
+        cin.ignore(maxChar, '\n');
+        cout << "Too Long. Please re-enter the album title:" << endl;
+        cin.getline(tempAlbumTitle, maxChar, '\n');
+    }
+    
+    strncpy(strcat(tempSongTitle, "; "), addedSong.songTitle, maxChar);
+    strncpy(strcat(tempArtistName, "; "), addedSong.artistName, maxChar);
+    strncpy(strcat(tempSongMins, "; "), addedSong.songMins, 4);
+    strncpy(strcat(tempSongSecs, "; "), addedSong.songSecs, 4);
+    strncpy(strcat(tempAlbumTitle, "; "), addedSong.albumTitle, maxChar);
+    addedSong.index = songListSize;
+    
+    cout << addedSong.songTitle << endl;
+    cout << addedSong.index << endl;
+    songListSize++;
+    
+    infile.open(fileName);
+    if(!infile){
+        infile.clear();
+        cout << "Could not add song at this time." << endl;
+        exit(1);
+    }
+    fileName << addedSong.songTitle;
+    fileName << addedSong.artistName;
+    fileName << addedSong.songMins;
+    fileName << addedSong.songSecs;
+    fileName << addedSong.albumTitle;
+    fileName << addedSong.index;
+    fileName << "\n";
+    infile.close();
+}
+
+void search(){
+
+}
+
 // remove songs by index
+void removeSong(){
+
+}
+
 // search for songs by artist
+void searchForArtist(){
+
+}
+
 //search for songs by album
-//quit
+void searchForAlbum(){
+
+}
 
 int displayChoices(){
     int usersChoice;
@@ -129,6 +229,7 @@ void runUserChoice(int programChoice, char fileName[], song songList[100], int& 
             break;
         case 5:
             cout << "you have chosen option 5:" << endl;
+            addNewSong(fileName, songList, songListSize);
             break;
         case 6:
             cout << endl;
@@ -155,6 +256,8 @@ int main()
         runUserChoice(programChoice, fileName, songList, songListSize);
         programChoice = displayChoices();
     }
+    
+    cout << "Thank you for using the music library. Your changes have been saved." << endl;
     
     return 0;
 }
