@@ -22,9 +22,11 @@ struct song {
     int    index;
 };
 void addSong(song& addedSong, song songList[], int& songListSize);
+void saveLibrary(char fileName[], song songList[], int& songListSize);
 void readLibrary(char fileName[], song songList[], int& songListSize);
 void displaySongs(song songList[], int& songListSize);
-void addNewSong(song songList[], int& songListSize);
+void addNewSong(char fileName[], song songList[], int& songListSize);
+void removeSong(char fileName[], song songList[], int& songListSize);
 
 //add a song to the library
 void addSong(song& addedSong, song songList[], int& songListSize){
@@ -35,6 +37,24 @@ void addSong(song& addedSong, song songList[], int& songListSize){
     strncpy(songList[songListSize].songSecs, addedSong.songSecs, 4);
     strncpy(songList[songListSize].albumTitle, addedSong.albumTitle, maxChar);
     addedSong.index = tempIndex;
+}
+
+void saveLibrary(char fileName[], song songList[], int& songListSize){
+    
+    ofstream outfile;
+    
+    outfile.open(fileName);
+    if(!outfile){
+        outfile.clear();
+        cout << "Could not open at this time." << endl;
+        exit(1);
+    }
+    
+    for(int i = 0; i < songListSize; i++){
+        outfile << songList[i].songTitle << ';' << songList[i].artistName << ';' << songList[i].songMins << ';' << songList[i].songSecs << ';' << songList[i].albumTitle << ';' << songList[i].index << endl;
+    }
+    
+    outfile.close();
 }
 
 //read the song library file
@@ -53,7 +73,7 @@ void readLibrary(char fileName[], song songList[], int& songListSize){
     
     if(!infile){
         infile.clear();
-        cout << "Could not open songs.txt at this time." << endl;
+        cout << "Could not open at this time." << endl;
         exit(1);
     }
     
@@ -67,7 +87,6 @@ void readLibrary(char fileName[], song songList[], int& songListSize){
         infile.get(songSecs, 4, ';');
         infile.get();
         infile.get(albumTitle, maxChar, ';');
-//        infile.ignore(100, ';');
         infile.ignore(100, '\n');
         
         strncpy(addedSong.songTitle, songTitle, maxChar);
@@ -79,7 +98,7 @@ void readLibrary(char fileName[], song songList[], int& songListSize){
         addSong(addedSong, songList, songListSize);
         songListSize++;
     }
-    songListSize--;
+//    songListSize--;
     infile.close();
 }
 
@@ -92,17 +111,15 @@ void displaySongs(song songList[], int& songListSize){
     }
 }
 
-
 // add songs
 void addNewSong(char fileName[], song songList[], int& songListSize){
+    
     song addedSong;
-
     char     tempSongTitle[maxChar];
     char     tempArtistName[maxChar];
     char     tempSongMins[4];
     char     tempSongSecs[4];
     char     tempAlbumTitle[maxChar];
-    ifstream infile;
     
     cout << "Please enter the title of the song you are add to the library:";
     cin.getline(tempSongTitle, maxChar, '\n');
@@ -112,7 +129,8 @@ void addNewSong(char fileName[], song songList[], int& songListSize){
         cout << "Too Long. Please re-enter the title:" << endl;
         cin.getline(tempSongTitle, maxChar, '\n');
     }
-    
+
+    cout << tempSongTitle << endl;
     cout << "Please enter the artist's name of the song you are adding to the library:";
     cin.getline(tempArtistName, maxChar, '\n');
     while(!cin){
@@ -149,31 +167,18 @@ void addNewSong(char fileName[], song songList[], int& songListSize){
         cin.getline(tempAlbumTitle, maxChar, '\n');
     }
     
-    strncpy(strcat(tempSongTitle, "; "), addedSong.songTitle, maxChar);
-    strncpy(strcat(tempArtistName, "; "), addedSong.artistName, maxChar);
-    strncpy(strcat(tempSongMins, "; "), addedSong.songMins, 4);
-    strncpy(strcat(tempSongSecs, "; "), addedSong.songSecs, 4);
-    strncpy(strcat(tempAlbumTitle, "; "), addedSong.albumTitle, maxChar);
+    strncpy(addedSong.songTitle, tempSongTitle, maxChar);
+    strncpy(addedSong.artistName, tempArtistName, maxChar);
+    strncpy(addedSong.songMins, tempSongMins, 4);
+    strncpy(addedSong.songSecs, tempSongSecs, 4);
+    strncpy(addedSong.albumTitle, tempAlbumTitle, maxChar);
     addedSong.index = songListSize;
     
-    cout << addedSong.songTitle << endl;
-    cout << addedSong.index << endl;
     songListSize++;
     
-    infile.open(fileName);
-    if(!infile){
-        infile.clear();
-        cout << "Could not add song at this time." << endl;
-        exit(1);
-    }
-    fileName << addedSong.songTitle;
-    fileName << addedSong.artistName;
-    fileName << addedSong.songMins;
-    fileName << addedSong.songSecs;
-    fileName << addedSong.albumTitle;
-    fileName << addedSong.index;
-    fileName << "\n";
-    infile.close();
+    addSong(addedSong, songList, songListSize);
+    saveLibrary(fileName, songList, songListSize);
+    
 }
 
 void search(){
@@ -181,8 +186,38 @@ void search(){
 }
 
 // remove songs by index
-void removeSong(){
-
+void removeSong(char fileName[], song songList[], int& songListSize){
+    int removeableIndex;
+    song tempList[songListSize];
+    bool indexFound = false;
+    
+    cout << "Please enter the index of the song that you would like to remove:" << endl;
+    cin >> removeableIndex;
+    while(!cin || !(cin < songListSize)){
+        cin.clear();
+        cin.ignore(100, '\n');
+        cout << "That is not a valid index, please try again:" << endl;
+        cin >> removeableIndex;
+    }
+    
+    for(int i = 0; i < songListSize; i++){
+        if(indexFound == true){
+            tempList[i] = songList[i-1];
+        } else if(i == removeableIndex){
+            indexFound = true;
+            tempList[i] = songList[i-1];
+        } else {
+            tempList[i] = songList[i];
+        }
+    }
+    songListSize--;
+    
+    for(int j = 0; j < songListSize; j++){
+        songList[j] = tempList[j];
+    }
+    
+    cout << "the song with index " << removeableIndex << " has been removed." << endl;
+    saveLibrary(fileName, songList, songListSize);
 }
 
 // search for songs by artist
@@ -220,6 +255,7 @@ void runUserChoice(int programChoice, char fileName[], song songList[100], int& 
             break;
         case 2:
             cout << "you have chosen option 2:" << endl;
+            removeSong(fileName, songList, songListSize);
             break;
         case 3:
             cout << "you have chosen option 3:" << endl;
