@@ -37,6 +37,7 @@ void addSong(song& addedSong, song songList[], int& songListSize){
     strncpy(songList[songListSize].songSecs, addedSong.songSecs, 4);
     strncpy(songList[songListSize].albumTitle, addedSong.albumTitle, maxChar);
     addedSong.index = tempIndex;
+    ++songListSize;
 }
 
 void saveLibrary(char fileName[], song songList[], int& songListSize){
@@ -47,7 +48,7 @@ void saveLibrary(char fileName[], song songList[], int& songListSize){
     if(!outfile){
         outfile.clear();
         cout << "Could not open at this time." << endl;
-        exit(1);
+        return;
     }
     
     for(int i = 0; i < songListSize; i++){
@@ -59,7 +60,7 @@ void saveLibrary(char fileName[], song songList[], int& songListSize){
 
 //read the song library file
 void readLibrary(char fileName[], song songList[], int& songListSize){
-    
+    songListSize = 0;
     ifstream infile;
     char     songTitle[maxChar];
     char     artistName[maxChar];
@@ -74,7 +75,7 @@ void readLibrary(char fileName[], song songList[], int& songListSize){
     if(!infile){
         infile.clear();
         cout << "Could not open at this time." << endl;
-        exit(1);
+        return;
     }
     
     while(!infile.eof()){
@@ -96,15 +97,14 @@ void readLibrary(char fileName[], song songList[], int& songListSize){
         strncpy(addedSong.albumTitle, albumTitle, maxChar);
         addedSong.index = songListSize;
         addSong(addedSong, songList, songListSize);
-        songListSize++;
+        cout << "added song " << songListSize << " songTitle: " << songTitle << endl;
     }
-//    songListSize--;
+
     infile.close();
 }
 
 //display all songs
 void displaySongs(song songList[], int& songListSize){
-    
     cout << left << setw(maxChar) << "Song Title" << setw(maxChar) << "Artist Name" << setw(7) << "Mins" << setw(1) << " " << setw(7) << "Secs" << setw(maxChar) << "Album Title" << setw(5) << "index" << endl;
     for(int i = 0; i < songListSize; i++){
         cout << left << setw(maxChar) << songList[i].songTitle << setw(maxChar) << songList[i].artistName << setw(7) << songList[i].songMins << setw(1) << " " << setw(7) << songList[i].songSecs << setw(maxChar) << songList[i].albumTitle << setw(5) << i << endl;
@@ -174,8 +174,6 @@ void addNewSong(char fileName[], song songList[], int& songListSize){
     strncpy(addedSong.albumTitle, tempAlbumTitle, maxChar);
     addedSong.index = songListSize;
     
-    songListSize++;
-    
     addSong(addedSong, songList, songListSize);
     saveLibrary(fileName, songList, songListSize);
     
@@ -193,7 +191,9 @@ void removeSong(char fileName[], song songList[], int& songListSize){
     
     cout << "Please enter the index of the song that you would like to remove:" << endl;
     cin >> removeableIndex;
-    while(!cin || !(cin < songListSize)){
+
+    //dont do !(x < y), if you write it out in words it's the same as x >= y and simpler
+    while(!cin || removeableIndex >= songListSize){
         cin.clear();
         cin.ignore(100, '\n');
         cout << "That is not a valid index, please try again:" << endl;
