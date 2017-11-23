@@ -78,7 +78,7 @@ void readLibrary(char fileName[], song songList[], int& songListSize){
         return;
     }
     
-    while(!infile.eof()){
+    while(infile.peek() != EOF){
         infile.get(songTitle, maxChar, ';');
         infile.get();
         infile.get(artistName, maxChar, ';');
@@ -98,8 +98,12 @@ void readLibrary(char fileName[], song songList[], int& songListSize){
         addedSong.index = songListSize;
         addSong(addedSong, songList, songListSize);
         cout << "added song " << songListSize << " songTitle: " << songTitle << endl;
+        
+        if(infile.peek() == EOF){
+            return;
+        }
     }
-
+    
     infile.close();
 }
 
@@ -129,7 +133,7 @@ void addNewSong(char fileName[], song songList[], int& songListSize){
         cout << "Too Long. Please re-enter the title:" << endl;
         cin.getline(tempSongTitle, maxChar, '\n');
     }
-
+    
     cout << tempSongTitle << endl;
     cout << "Please enter the artist's name of the song you are adding to the library:";
     cin.getline(tempArtistName, maxChar, '\n');
@@ -148,7 +152,7 @@ void addNewSong(char fileName[], song songList[], int& songListSize){
         cout << "Too Long. Please re-enter the minutes:" << endl;
         cin.getline(tempSongMins, 4, '\n');
     }
-
+    
     cout << "Please enter the seconds of the song you are adding to the library:";
     cin.getline(tempSongSecs, 4, '\n');
     while(!cin){
@@ -180,7 +184,7 @@ void addNewSong(char fileName[], song songList[], int& songListSize){
 }
 
 void search(){
-
+    
 }
 
 // remove songs by index
@@ -191,8 +195,7 @@ void removeSong(char fileName[], song songList[], int& songListSize){
     
     cout << "Please enter the index of the song that you would like to remove:" << endl;
     cin >> removeableIndex;
-
-    //dont do !(x < y), if you write it out in words it's the same as x >= y and simpler
+    
     while(!cin || removeableIndex >= songListSize){
         cin.clear();
         cin.ignore(100, '\n');
@@ -202,10 +205,10 @@ void removeSong(char fileName[], song songList[], int& songListSize){
     
     for(int i = 0; i < songListSize; i++){
         if(indexFound == true){
-            tempList[i] = songList[i-1];
+            tempList[i] = songList[i+1];
         } else if(i == removeableIndex){
             indexFound = true;
-            tempList[i] = songList[i-1];
+            tempList[i] = songList[i+1];
         } else {
             tempList[i] = songList[i];
         }
@@ -222,12 +225,12 @@ void removeSong(char fileName[], song songList[], int& songListSize){
 
 // search for songs by artist
 void searchForArtist(){
-
+    
 }
 
 //search for songs by album
 void searchForAlbum(){
-
+    
 }
 
 int displayChoices(){
@@ -297,7 +300,6 @@ int main()
     
     return 0;
 }
-
 
 
 
