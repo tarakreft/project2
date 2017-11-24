@@ -27,6 +27,8 @@ void readLibrary(char fileName[], song songList[], int& songListSize);
 void displaySongs(song songList[], int& songListSize);
 void addNewSong(char fileName[], song songList[], int& songListSize);
 void removeSong(char fileName[], song songList[], int& songListSize);
+void searchForArtist(song songList[], int& songListSize);
+void searchForAlbum(song songList[], int& songListSize);
 
 //add a song to the library
 void addSong(song& addedSong, song songList[], int& songListSize){
@@ -97,7 +99,6 @@ void readLibrary(char fileName[], song songList[], int& songListSize){
         strncpy(addedSong.albumTitle, albumTitle, maxChar);
         addedSong.index = songListSize;
         addSong(addedSong, songList, songListSize);
-        cout << "added song " << songListSize << " songTitle: " << songTitle << endl;
         
         if(infile.peek() == EOF){
             return;
@@ -183,10 +184,6 @@ void addNewSong(char fileName[], song songList[], int& songListSize){
     
 }
 
-void search(){
-    
-}
-
 // remove songs by index
 void removeSong(char fileName[], song songList[], int& songListSize){
     int removeableIndex;
@@ -224,13 +221,61 @@ void removeSong(char fileName[], song songList[], int& songListSize){
 }
 
 // search for songs by artist
-void searchForArtist(){
+void searchForArtist(song songList[], int& songListSize){
+    char searchTerm[maxChar];
+    int matches = 0;
     
+    cout << "enter the artist you would like to search for: " << endl;
+    
+    cin.getline(searchTerm, maxChar, '\n');
+    while(!cin){
+        cin.clear();
+        cin.ignore(maxChar, '\n');
+        cout << "Too Long. Please re-enter the artist:" << endl;
+        cin.getline(searchTerm, maxChar, '\n');
+    }
+
+    cout << left << setw(maxChar) << "Song Title" << setw(maxChar) << "Artist Name" << setw(7) << "Mins" << setw(1) << " " << setw(7) << "Secs" << setw(maxChar) << "Album Title" << setw(5) << "index" << endl;
+    
+    for(int i=0; i < songListSize; i++){
+        if(strcmp(searchTerm,songList[i].artistName) == 0){
+            matches++;
+            cout << left << setw(maxChar) << songList[i].songTitle << setw(maxChar) << songList[i].artistName << setw(7) << songList[i].songMins << setw(1) << " " << setw(7) << songList[i].songSecs << setw(maxChar) << songList[i].albumTitle << setw(5) << songList[i].index << endl;
+        }
+    }
+    
+    if(matches == 0){
+        cout << "I'm sorry, there are no matches for that artist" << endl;
+    }
 }
 
 //search for songs by album
-void searchForAlbum(){
+void searchForAlbum(song songList[], int& songListSize){
+    char searchTerm[maxChar];
+    int matches = 0;
     
+    cout << "enter the album you would like to search for: " << endl;
+    
+    cin.getline(searchTerm, maxChar, '\n');
+    while(!cin){
+        cin.clear();
+        cin.ignore(maxChar, '\n');
+        cout << "Too Long. Please re-enter the album:" << endl;
+        cin.getline(searchTerm, maxChar, '\n');
+    }
+    
+    cout << left << setw(maxChar) << "Song Title" << setw(maxChar) << "Artist Name" << setw(7) << "Mins" << setw(1) << " " << setw(7) << "Secs" << setw(maxChar) << "Album Title" << setw(5) << "index" << endl;
+    
+    for(int i=0; i < songListSize; i++){
+        if(strcmp(searchTerm,songList[i].albumTitle) == 0){
+            matches++;
+            cout << left << setw(maxChar) << songList[i].songTitle << setw(maxChar) << songList[i].artistName << setw(7) << songList[i].songMins << setw(1) << " " << setw(7) << songList[i].songSecs << setw(maxChar) << songList[i].albumTitle << setw(5) << songList[i].index << endl;
+        }
+    }
+    
+    if(matches == 0){
+        cout << "I'm sorry, there are no matches for that album" << endl;
+    }
 }
 
 int displayChoices(){
@@ -262,9 +307,11 @@ void runUserChoice(int programChoice, char fileName[], song songList[100], int& 
             break;
         case 3:
             cout << "you have chosen option 3:" << endl;
+            searchForArtist(songList, songListSize);
             break;
         case 4:
             cout << "you have chosen option 4:" << endl;
+            searchForAlbum(songList, songListSize);
             break;
         case 5:
             cout << "you have chosen option 5:" << endl;
